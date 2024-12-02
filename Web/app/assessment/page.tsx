@@ -18,40 +18,54 @@ import { Heart, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import axios from 'axios'
 
 export default function Assessment() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    age: "",
-    sex: "",
-    chestPain: "",
-    restingBP: "",
-    cholesterol: "",
-    fastingBS: "",
-    restingECG: "",
-    maxHR: "",
-    exerciseAngina: "",
-    oldpeak: "",
-    stSlope: "",
-  });
+  const [age, setAge] = useState("");
+  const [sex, setSex] = useState("");
+  const [cp, setCp] = useState("");
+  const [trestbps, setTrestbps] = useState("");
+  const [chol, setChol] = useState("");
+  const [fbs, setFbs] = useState("");
+  const [restecg, setRestecg] = useState("");
+  const [thalach, setThalach] = useState("");
+  const [exang, setExang] = useState("");
+  const [oldpeak, setOldpeak] = useState("");
+  const [slope, setSlope] = useState("");
+  const [ca, setCa] = useState("");
+  const [thal, setThal] = useState("");
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-  };
+  const data = {
+    age: Number(age),
+    sex: Number(sex),
+    cp: Number(cp),
+    trestbps: Number(trestbps),
+    chol: Number(chol),
+    fbs: Number(fbs),
+    restecg: Number(restecg),
+    thalach: Number(thalach),
+    exang: Number(exang),
+    oldpeak: Number(oldpeak),
+    slope: Number(slope),
+    ca: Number(ca),
+    thal: Number(thal),
+  }
 
-  const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(formData);
+    console.log(data);
     toast({
       title: "Assessment Submitted",
       description:
         "Your heart health assessment has been received. We'll process your results shortly.",
     });
+    const res = await axios.post("http://localhost:8000/predict", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log(res.data);
     router.push('/result');
   };
 
@@ -71,123 +85,132 @@ export default function Assessment() {
                   name="age"
                   type="number"
                   placeholder="Enter your age"
-                  value={formData.age}
-                  onChange={handleInputChange}
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                  min="1"
+                  max="120"
                   required
                 />
-                <p className="text-sm text-gray-500">Your current age in years.</p>
+                <p className="text-sm text-gray-500">Your current age in years (1-120).</p>
               </div>
               <div className="space-y-2">
                 <Label>Sex</Label>
-                <RadioGroup name="sex" value={formData.sex} onValueChange={(value) => handleSelectChange('sex', value)} required>
+                <RadioGroup name="sex" value={sex} onValueChange={(value) => setSex(value)} required>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="male" id="male" />
+                    <RadioGroupItem value="1" id="male" />
                     <Label htmlFor="male">Male</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="female" id="female" />
+                    <RadioGroupItem value="0" id="female" />
                     <Label htmlFor="female">Female</Label>
                   </div>
                 </RadioGroup>
                 <p className="text-sm text-gray-500">Your biological sex at birth.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="chestPain">Chest Pain Type</Label>
-                <Select name="chestPain" value={formData.chestPain} onValueChange={(value) => handleSelectChange('chestPain', value)} required>
+                <Label htmlFor="cp">Chest Pain Type</Label>
+                <Select name="cp" value={cp} onValueChange={(value) => setCp(value)} required>
                   <SelectTrigger>
                     <SelectValue placeholder="Select chest pain type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="TA">Typical Angina</SelectItem>
-                    <SelectItem value="ATA">Atypical Angina</SelectItem>
-                    <SelectItem value="NAP">Non-Anginal Pain</SelectItem>
-                    <SelectItem value="ASY">Asymptomatic</SelectItem>
+                    <SelectItem value="0">Typical Angina</SelectItem>
+                    <SelectItem value="1">Atypical Angina</SelectItem>
+                    <SelectItem value="2">Non-Anginal Pain</SelectItem>
+                    <SelectItem value="3">Asymptomatic</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-gray-500">The type of chest pain you experience, if any.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="restingBP">Resting Blood Pressure (mm Hg)</Label>
+                <Label htmlFor="trestbps">Resting Blood Pressure (mm Hg)</Label>
                 <Input
-                  id="restingBP"
-                  name="restingBP"
+                  id="trestbps"
+                  name="trestbps"
                   type="number"
                   placeholder="Enter resting BP"
-                  value={formData.restingBP}
-                  onChange={handleInputChange}
+                  value={trestbps}
+                  onChange={(e) => setTrestbps(e.target.value)}
+                  min="60"
+                  max="250"
                   required
                 />
-                <p className="text-sm text-gray-500">Your blood pressure when you're at rest, measured in millimeters of mercury.</p>
+                <p className="text-sm text-gray-500">Your resting blood pressure (60-250 mm Hg).</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="cholesterol">Cholesterol (mg/dL)</Label>
+                <Label htmlFor="chol">Serum Cholesterol (mg/dl)</Label>
                 <Input
-                  id="cholesterol"
-                  name="cholesterol"
+                  id="chol"
+                  name="chol"
                   type="number"
                   placeholder="Enter cholesterol level"
-                  value={formData.cholesterol}
-                  onChange={handleInputChange}
+                  value={chol}
+                  onChange={(e) => setChol(e.target.value)}
+                  min="100"
+                  max="600"
                   required
                 />
-                <p className="text-sm text-gray-500">Your total cholesterol level in milligrams per deciliter of blood.</p>
+                <p className="text-sm text-gray-500">Your serum cholesterol level (100-600 mg/dl).</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="fastingBS">Fasting Blood Sugar</Label>
-                <Select name="fastingBS" value={formData.fastingBS} onValueChange={(value) => handleSelectChange('fastingBS', value)} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select fasting BS" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="0">Less than 120 mg/dL</SelectItem>
-                    <SelectItem value="1">Greater than 120 mg/dL</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-gray-500">Your blood sugar level after fasting for at least 8 hours.</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="restingECG">Resting ECG</Label>
-                <Select name="restingECG" value={formData.restingECG} onValueChange={(value) => handleSelectChange('restingECG', value)} required>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select resting ECG" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Normal">Normal</SelectItem>
-                    <SelectItem value="ST">ST-T wave abnormality</SelectItem>
-                    <SelectItem value="LVH">Left ventricular hypertrophy</SelectItem>
-                  </SelectContent>
-                </Select>
-                <p className="text-sm text-gray-500">Results of your electrocardiogram when you're at rest.</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="maxHR">Maximum Heart Rate</Label>
-                <Input
-                  id="maxHR"
-                  name="maxHR"
-                  type="number"
-                  placeholder="Enter max heart rate"
-                  value={formData.maxHR}
-                  onChange={handleInputChange}
-                  required
-                />
-                <p className="text-sm text-gray-500">The highest heart rate you've achieved during exercise.</p>
-              </div>
-              <div className="space-y-2">
-                <Label>Exercise-Induced Angina</Label>
-                <RadioGroup name="exerciseAngina" value={formData.exerciseAngina} onValueChange={(value) => handleSelectChange('exerciseAngina', value)} required>
+                <Label htmlFor="fbs">Fasting Blood Sugar {">"} 120 mg/dl</Label>
+                <RadioGroup name="fbs" value={fbs} onValueChange={(value) => setFbs(value)} required>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="Y" id="angina-yes" />
-                    <Label htmlFor="angina-yes">Yes</Label>
+                    <RadioGroupItem value="1" id="fbs-yes" />
+                    <Label htmlFor="fbs-yes">Yes</Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="N" id="angina-no" />
-                    <Label htmlFor="angina-no">No</Label>
+                    <RadioGroupItem value="0" id="fbs-no" />
+                    <Label htmlFor="fbs-no">No</Label>
                   </div>
                 </RadioGroup>
-                <p className="text-sm text-gray-500">Whether you experience chest pain during physical activity.</p>
+                <p className="text-sm text-gray-500">Is your fasting blood sugar greater than 120 mg/dl?</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="oldpeak">ST Depression (Oldpeak)</Label>
+                <Label htmlFor="restecg">Resting Electrocardiographic Results</Label>
+                <Select name="restecg" value={restecg} onValueChange={(value) => setRestecg(value)} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select ECG result" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">Normal</SelectItem>
+                    <SelectItem value="1">ST-T Wave Abnormality</SelectItem>
+                    <SelectItem value="2">Left Ventricular Hypertrophy</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500">Your resting electrocardiographic results.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="thalach">Maximum Heart Rate Achieved</Label>
+                <Input
+                  id="thalach"
+                  name="thalach"
+                  type="number"
+                  placeholder="Enter max heart rate"
+                  value={thalach}
+                  onChange={(e) => setThalach(e.target.value)}
+                  min="60"
+                  max="220"
+                  required
+                />
+                <p className="text-sm text-gray-500">Your maximum heart rate achieved (60-220 bpm).</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="exang">Exercise Induced Angina</Label>
+                <RadioGroup name="exang" value={exang} onValueChange={(value) => setExang(value)} required>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="1" id="exang-yes" />
+                    <Label htmlFor="exang-yes">Yes</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="0" id="exang-no" />
+                    <Label htmlFor="exang-no">No</Label>
+                  </div>
+                </RadioGroup>
+                <p className="text-sm text-gray-500">Do you experience chest pain during exercise?</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="oldpeak">ST Depression Induced by Exercise Relative to Rest</Label>
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -198,33 +221,64 @@ export default function Assessment() {
                           type="number"
                           step="0.1"
                           placeholder="Enter ST depression"
-                          value={formData.oldpeak}
-                          onChange={handleInputChange}
+                          value={oldpeak}
+                          onChange={(e) => setOldpeak(e.target.value)}
+                          min="0"
+                          max="6.2"
                           required
                         />
                         <HelpCircle className="h-4 w-4 ml-2 text-gray-500" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>ST depression induced by exercise relative to rest. Measured in millimeters.</p>
+                      <p>ST depression induced by exercise relative to rest (0-6.2 mm).</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
                 <p className="text-sm text-gray-500">The ST segment depression observed during exercise testing.</p>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="stSlope">ST Slope</Label>
-                <Select name="stSlope" value={formData.stSlope} onValueChange={(value) => handleSelectChange('stSlope', value)} required>
+                <Label htmlFor="slope">The Slope of the Peak Exercise ST Segment</Label>
+                <Select name="slope" value={slope} onValueChange={(value) => setSlope(value)} required>
                   <SelectTrigger>
                     <SelectValue placeholder="Select ST slope" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Up">Upsloping</SelectItem>
-                    <SelectItem value="Flat">Flat</SelectItem>
-                    <SelectItem value="Down">Downsloping</SelectItem>
+                    <SelectItem value="0">Upsloping</SelectItem>
+                    <SelectItem value="1">Flat</SelectItem>
+                    <SelectItem value="2">Downsloping</SelectItem>
                   </SelectContent>
                 </Select>
                 <p className="text-sm text-gray-500">The slope of the ST segment during peak exercise.</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ca">Number of Major Vessels Colored by Fluoroscopy</Label>
+                <Select name="ca" value={ca} onValueChange={(value) => setCa(value)} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select number of vessels" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="0">0</SelectItem>
+                    <SelectItem value="1">1</SelectItem>
+                    <SelectItem value="2">2</SelectItem>
+                    <SelectItem value="3">3</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500">The number of major blood vessels colored by fluoroscopy (0-3).</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="thal">Thalassemia</Label>
+                <Select name="thal" value={thal} onValueChange={(value) => setThal(value)} required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select thalassemia type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="1">Normal</SelectItem>
+                    <SelectItem value="2">Fixed Defect</SelectItem>
+                    <SelectItem value="3">Reversible Defect</SelectItem>
+                  </SelectContent>
+                </Select>
+                <p className="text-sm text-gray-500">The type of thalassemia (a blood disorder affecting hemoglobin).</p>
               </div>
             </div>
             <Button type="submit" className="w-full bg-red-500 hover:bg-red-600 text-white">
