@@ -19,12 +19,9 @@ import {
   Utensils,
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export default function Page() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  // Dummy data for demonstration
+export default function Page({ params }: { params: Promise<{ result: number }> }) {
   const assessmentResult = {
     riskScore: 65,
     riskLevel: "Moderate",
@@ -51,6 +48,11 @@ export default function Page() {
       "Schedule a follow-up with a cardiologist for a more comprehensive evaluation",
     ],
   };
+
+  useEffect(() => {
+    console.log(params);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 py-8 px-4 md:px-6">

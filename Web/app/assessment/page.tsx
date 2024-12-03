@@ -65,8 +65,8 @@ export default function Assessment() {
         "Content-Type": "application/json",
       },
     });
-    console.log(res.data);
-    router.push('/result');
+    console.log(res.data.prediction);
+    router.push(`/result/${res.data.prediction}`);
   };
 
   return (

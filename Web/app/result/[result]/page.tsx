@@ -11,14 +11,17 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertTriangle, Heart, Menu, User, Utensils } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export default function Page() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+const page = ({ params }: { params: { result: number } }) => {
+  const id = params;
+  const score = Math.round(id.result);
+  const riskLevel = score < 30 ? "Low" : score < 70 ? "Medium" : "High";
+  
   const predictionResult = {
-    riskLevel: "Moderate",
-    riskPercentage: 65,
+    riskLevel: riskLevel,
+    // riskPercentage: Math.round(score),
+    riskPercentage: 80,
     keyFactors: [
       "High blood pressure",
       "Elevated cholesterol",
@@ -82,6 +85,10 @@ export default function Page() {
     },
   ];
 
+  useEffect(() => {
+    console.log(score)
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1 py-8 px-4 md:px-6">
@@ -107,7 +114,7 @@ export default function Page() {
                     {predictionResult.riskPercentage}% chance of heart disease
                   </p>
                 </div>
-                <AlertTriangle className="h-24 w-24 text-yellow-500" />
+                <AlertTriangle className={`h-24 w-24 ${predictionResult.riskPercentage > 75 ? "text-red-500" : predictionResult.riskPercentage > 50 ? "text-yellow-500" : "text-green-400"}`} />
               </div>
               <div className="mt-4">
                 <p className="font-semibold">
@@ -195,3 +202,5 @@ export default function Page() {
     </div>
   );
 }
+
+export default page;
