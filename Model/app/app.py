@@ -6,6 +6,8 @@ import google.generativeai as genai
 from dotenv import load_dotenv
 import os
 
+print(dir(genai))
+
 load_dotenv()
 
 app = Flask(__name__)
@@ -36,6 +38,9 @@ def predict():
 def generate_diet():
     user_data = request.json
 
+    models = genai.get_model('models/gemini-1.5-flash')
+    print(models)
+
     prompt = (
         f"Based on the following health data:\n"
         f"Age: {user_data.get('age')}, Sex: {'Male' if user_data.get('sex') == 1 else 'Female'},\n"
@@ -48,15 +53,15 @@ def generate_diet():
     )
 
     try:
-        response = genai.generate(
-            model="models/gemini-1.5-flash",  # Replace with the correct model
-            messages=[{"role": "user", "content": prompt}]
-        )
+        chat = genai.start_chat(models)
+        
+        response = chat.send_message(prompt)
+        print(response)
 
-        return jsonify({"diet_plan": response['candidates'][0]['output']})
+        return jsonify({"diet_plan": response})
 
     except Exception as e:
         return jsonify({"error": str(e)})
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+    app.run(debug=True, port=8000)  
