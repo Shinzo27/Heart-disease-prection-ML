@@ -1,7 +1,9 @@
 "use client"
 
+import { useEffect } from "react";
 import { Button } from "./ui/button";
 import { useRouter } from 'next/navigation'; 
+import model from "@/lib/gemini";
 
 export default function Page() {
   const router = useRouter();
@@ -10,6 +12,14 @@ export default function Page() {
     router.push('/assessment');
   }
 
+  useEffect(()=>{
+    async function generate(){
+      const prompt = "Explain the difference between a computer and a human";
+      const result = await model.generateContent([prompt]);
+      console.log(result.response.text());
+    }
+    generate();
+  })
   return (
     <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 bg-red-50 flex justify-center items-center">
       <div className="container px-4 md:px-6">
