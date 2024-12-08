@@ -2,10 +2,32 @@
 import model from "@/lib/gemini";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import MarkdownIt from "markdown-it";
+
+
+interface Analysis {
+  problemAreas: string[];
+  suggestions: string[];
+}
+
+interface DietRecommendation {
+  foods: string[];
+  exercises: string[];
+  supplements: string[];
+}
 
 const page = () => {
     const [response, setResponse] = useState("");
-    const [analysis, setAnalysis] = useState("");
+    const [dietRecommendation, setDietRecommendation] = useState<DietRecommendation>({
+      foods: [],
+      exercises: [],
+      supplements: []
+    });
+    const [analysis, setAnalysis] = useState<Analysis>({
+      problemAreas: [],
+      suggestions: []
+    });
+    const md = new MarkdownIt();
 
     useEffect(()=>{
         async function generate(){
@@ -28,11 +50,15 @@ const page = () => {
               {
                 "status": "success",
                 "data": {
-                  "dietRecommendation": ["string"],
+                  "dietRecommendation": {
+                    "foods": ["string"],
+                    "exercises": ["string"],
+                    "supplements": ["string"]
+                  },
                   "analysis": {
                     "problemAreas": ["string"],
                     "suggestions": ["string"]
-                  }
+                  } 
                 },
                 "error": "null or string"
               }
@@ -54,9 +80,13 @@ const page = () => {
 
               Provide a response in this format.`
           const result = await model.generateContent([prompt]); 
+
           setResponse(result.response.text());
-          console.log(result.response.text());
-          setAnalysis(result.response.text());
+          const parse = md.parse(result.response.text(), {});
+          const json = JSON.parse(parse[0].content);
+          setAnalysis(json.data.analysis);
+          setDietRecommendation(json.data.dietRecommendation);
+          console.log(json);
         }
         generate();
       }, []);
@@ -67,12 +97,78 @@ const page = () => {
         <div>
           {
             response.includes("data") &&
-            <div>
-              <h2>Analysis</h2>
+            <>
               <div>
-                  <ReactMarkdown>{analysis}</ReactMarkdown>
+                <h2>Analysis</h2>
+                <div>
+                    {
+                      analysis.problemAreas.length > 0 &&
+                      <div>
+                        <h3>Problem Areas</h3>
+                        <ul>
+                          {analysis.problemAreas.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    }
+                </div>
               </div>
-            </div>
+              <div>
+                <h2>Suggestions</h2>
+                <div>
+                    {
+                      analysis.suggestions.length > 0 &&
+                      <div>
+                        <h3>Suggestions</h3>
+                        <ul>
+                          {analysis.suggestions.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    }
+                </div>
+              </div>
+              <div>
+                <h2>Diet Recommendation</h2>
+                <div>
+                    {
+                      analysis.suggestions.length > 0 &&
+                      <div>
+                        <h3>Foods</h3>
+                        <ul>
+                          {dietRecommendation.foods.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    }
+                    {
+                      analysis.suggestions.length > 0 &&
+                      <div>
+                        <h3>Exercises</h3>
+                        <ul>
+                          {dietRecommendation.exercises.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    }
+                    {
+                      analysis.suggestions.length > 0 &&
+                      <div>
+                        <h3>Supplements</h3>
+                        <ul>
+                          {dietRecommendation.supplements.map((item, index) => (
+                            <li key={index}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    }
+                </div>
+              </div>
+            </>
           }
         </div>
       </>

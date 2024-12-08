@@ -19,6 +19,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from 'axios'
+import Loader from "@/components/Loader";
 
 export default function Assessment() {
   const router = useRouter();
@@ -35,6 +36,7 @@ export default function Assessment() {
   const [slope, setSlope] = useState("");
   const [ca, setCa] = useState("");
   const [thal, setThal] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const data = {
     age: Number(age),
@@ -54,22 +56,36 @@ export default function Assessment() {
 
   const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(data);
-    toast({
-      title: "Assessment Submitted",
-      description:
-        "Your heart health assessment has been received. We'll process your results shortly.",
-    });
-    const res = await axios.post("http://localhost:8000/predict", data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    console.log(res.data.prediction);
-    router.push(`/result/${res.data.prediction}`);
+    setLoading(true);
+    try {
+      // const apiRes = await fetch("/api/assessment", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify(data),
+      // });
+      // const apiData = await apiRes.json();
+      const res = await axios.post("http://localhost:8000/predict", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      console.log(res.data.prediction);
+      router.push(`/result/${res.data.prediction}`);
+      toast({
+        title: "Assessment Submitted",
+        description:
+          "Your heart health assessment has been received. We'll process your results shortly.",
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  return (
+  return loading ? <Loader /> : (
     <div className="flex flex-col min-h-screen">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center mb-8">

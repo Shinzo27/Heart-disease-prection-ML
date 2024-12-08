@@ -38,7 +38,7 @@ model HealthMetric {
   slope      Int      // Slope of the peak exercise ST segment (0-2)
   ca         Int      // Number of major vessels (0-4)
   thal       Int      // Thalassemia type (0-3)
-  target     Boolean? // Heart disease prediction result
+  prediction Int      // Predicted heart disease probability
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   dietRecommendations DietRecommendation[]

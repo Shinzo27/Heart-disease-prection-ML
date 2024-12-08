@@ -21,7 +21,7 @@ const page = ({ params }: { params: { result: number } }) => {
   const predictionResult = {
     riskLevel: riskLevel,
     // riskPercentage: Math.round(score),
-    riskPercentage: 80,
+    riskPercentage: score,
     keyFactors: [
       "High blood pressure",
       "Elevated cholesterol",
@@ -129,7 +129,7 @@ const page = ({ params }: { params: { result: number } }) => {
             </CardContent>
           </Card>
 
-          <Tabs defaultValue="diet">
+          {/* <Tabs defaultValue="diet">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="diet">Recommended Diet Plans</TabsTrigger>
               <TabsTrigger value="doctors">Recommended Doctors</TabsTrigger>
@@ -190,7 +190,7 @@ const page = ({ params }: { params: { result: number } }) => {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
+          </Tabs> */}
 
           <div className="text-center">
             <Button asChild>
