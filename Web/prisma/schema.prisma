@@ -12,13 +12,11 @@ model User {
   name       String
   email      String    @unique
   password   String
-  age        Int
-  sex        String    // Use "Male", "Female", or "Other"
   createdAt  DateTime  @default(now())
 
   healthMetrics      HealthMetric[]
   userFeedbacks       UserFeedback[]
-dietRecommendations DietRecommendation[]
+  dietRecommendations DietRecommendation[]
 }
 
 model HealthMetric {
