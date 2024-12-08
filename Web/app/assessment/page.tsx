@@ -58,26 +58,60 @@ export default function Assessment() {
     e.preventDefault();
     setLoading(true);
     try {
-      // const apiRes = await fetch("/api/assessment", {
-      //   method: "POST",
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //   },
-      //   body: JSON.stringify(data),
-      // });
-      // const apiData = await apiRes.json();
       const res = await axios.post("http://localhost:8000/predict", data, {
         headers: {
           "Content-Type": "application/json",
         },
       });
       console.log(res.data.prediction);
-      router.push(`/result/${res.data.prediction}`);
-      toast({
-        title: "Assessment Submitted",
-        description:
-          "Your heart health assessment has been received. We'll process your results shortly.",
-      });
+      const prediction = Math.round(res.data.prediction);
+      if(prediction){
+        const insert = await fetch("/api/assessment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            age: age,
+            sex: sex,
+            cp: cp,
+            trestbps: trestbps,
+            chol: chol,
+            fbs: fbs,
+            restecg: restecg,
+            thalach: thalach,
+            exang: exang,
+            oldpeak: oldpeak,
+            slope: slope,
+            ca: ca,
+            thal: thal,
+            prediction: prediction,
+          }),
+        });
+        if(insert){
+          const data = await insert.json();
+          if(data.status === "success"){
+            toast({
+              title: "Assessment Submitted",
+              description:
+                "Your heart health assessment has been received. We'll process your results shortly.",
+            });
+            router.push(`/result/${prediction}`);
+          } else {
+            toast({
+              title: "Assessment Not Submitted",
+              description:
+                "Your heart health assessment has not been received. Please try again later.",
+            });
+          }
+        }
+      } else {
+        toast({
+          title: "Assessment Not Submitted",
+          description:
+            "Your heart health assessment has not been received. Please try again later.",
+        });
+      }
     } catch (error) {
       console.log(error);
     } finally {
