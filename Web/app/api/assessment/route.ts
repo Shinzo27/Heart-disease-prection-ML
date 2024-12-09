@@ -27,7 +27,6 @@ export async function POST(req: NextRequest) {
   });
 
   if(insert) {
-    console.log(insert);
     return NextResponse.json({
         status: 'success',
         data: {

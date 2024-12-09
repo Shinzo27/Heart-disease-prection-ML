@@ -8,7 +8,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import model from "@/lib/gemini";
 import { AlertTriangle, Heart, Menu, User, Utensils } from "lucide-react";
 import MarkdownIt from "markdown-it";
@@ -102,8 +101,7 @@ const ResultComponent = (result: any) => {
                   }}
       
                   Provide a response in this format.`
-              const result = await model.generateContent([prompt]); 
-      
+              const result = await model.generateContent([prompt]);       
               setResponse(result.response.text());
               const parse = md.parse(result.response.text(), {});
               const json = JSON.parse(parse[0].content);
@@ -224,7 +222,7 @@ const ResultComponent = (result: any) => {
 
           <div className="text-center">
             <Button asChild>
-              <Link href="/details">Explain Assessment</Link>
+              <Link href={`/details/${id}`}>Explain Assessment</Link>
             </Button>
           </div>
         </div>
