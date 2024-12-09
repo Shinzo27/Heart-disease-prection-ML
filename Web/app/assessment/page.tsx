@@ -63,7 +63,6 @@ export default function Assessment() {
           "Content-Type": "application/json",
         },
       });
-      console.log(res.data.prediction);
       const prediction = Math.round(res.data.prediction);
       if(prediction){
         const insert = await fetch("/api/assessment", {
@@ -96,7 +95,7 @@ export default function Assessment() {
               description:
                 "Your heart health assessment has been received. We'll process your results shortly.",
             });
-            router.push(`/result/${prediction}`);
+            router.push(`/result/${data.data.id}`);
           } else {
             toast({
               title: "Assessment Not Submitted",

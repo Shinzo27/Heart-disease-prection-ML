@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma
+import { prisma } from '@/lib/prisma';
 
- } from '@/lib/prisma';
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
@@ -28,12 +27,44 @@ export async function POST(req: NextRequest) {
   });
 
   if(insert) {
+    console.log(insert);
     return NextResponse.json({
         status: 'success',
         data: {
-          prediction: Math.round(Math.random() * 100),
+          prediction: insert.prediction,
+          id: insert.id
         },
       });
+  } else {
+    return NextResponse.json({
+      status: 'error',
+      data: {
+        error: 'Something went wrong',
+      },
+    });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const body = await req.json();
+  const { id } = body;
+
+  const healthMetric = await prisma.healthMetric.findUnique({
+    where: {
+      id: Number(id),
+    },
+    include: {
+      user: true,
+    },
+  });
+
+  if(healthMetric) {
+    return NextResponse.json({
+      status: 'success',
+      data: {
+        healthMetric: healthMetric,
+      },
+    });
   } else {
     return NextResponse.json({
       status: 'error',
