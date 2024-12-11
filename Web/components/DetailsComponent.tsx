@@ -1,10 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useChat } from 'ai/react';
+import { ScrollArea } from "@/components/ui/scroll-area"
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -13,8 +16,11 @@ import {
   Activity,
   AlertTriangle,
   Brain,
+  MessageCircle,
+  Send,
   User,
   Utensils,
+  X,
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
@@ -25,6 +31,8 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
   const [problemAreas, setProblemAreas] = useState<string[]>([]);
   const [exerciseDetails, setExerciseDetails] = useState<string[]>([]);
   const [assessmentData, setAssessmentData] = useState<any>(assessmentResult);
+  const [isChatOpen, setIsChatOpen] = useState(false)
+  const { messages, input, handleInputChange, handleSubmit } = useChat()
 
   useEffect(() => {
     console.log(assessmentResult);
@@ -208,6 +216,56 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
           </div>
         </div>
       </main>
+      {/* Chatbot Support */}
+      <div className="fixed bottom-4 right-4 z-50">
+        {!isChatOpen && (
+          <Button
+            onClick={() => setIsChatOpen(true)}
+            className="rounded-full w-12 h-12 bg-red-500 hover:bg-red-600 text-white shadow-lg"
+          >
+            <MessageCircle className="h-6 w-6" />
+          </Button>
+        )}
+        {isChatOpen && (
+          <Card className="w-[90vw] max-w-[600px] h-[80vh] max-h-[800px] flex flex-col shadow-xl">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-lg font-medium">Chat Support</CardTitle>
+              <Button
+                onClick={() => setIsChatOpen(false)}
+                variant="ghost"
+                className="h-8 w-8 p-0"
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </CardHeader>
+            <CardContent className="flex-grow overflow-hidden py-6">
+              <ScrollArea className="h-full w-full pr-4">
+                {messages.map(m => (
+                  <div key={m.id} className={`mb-4 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+                    <span className={`inline-block p-3 rounded-lg ${m.role === 'user' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
+                      {m.content}
+                    </span>
+                  </div>
+                ))}
+              </ScrollArea>
+            </CardContent>
+            <CardFooter>
+              <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
+                <Input
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Type your message..."
+                  className="flex-grow text-base"
+                />
+                <Button type="submit" size="icon" className="shrink-0">
+                  <Send className="h-5 w-5" />
+                  <span className="sr-only">Send</span>
+                </Button>
+              </form>
+            </CardFooter>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };
