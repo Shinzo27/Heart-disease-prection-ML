@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { Input } from "./ui/input";
 
 const DetailsComponent = ({result, assessmentResult}: any) => {
   const [dietRecommendations, setDietRecommendations] = useState<string[]>([]);
