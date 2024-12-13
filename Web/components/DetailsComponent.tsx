@@ -38,10 +38,9 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
   const [exerciseDetails, setExerciseDetails] = useState<string[]>([]);
   const [assessmentData, setAssessmentData] = useState<any>(assessmentResult);
   const [isChatOpen, setIsChatOpen] = useState(false)
-  const { messages, input, handleInputChange, handleSubmit } = useChat()
-  const [loading, setLoading] = useState(false);
-  const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     console.log(assessmentResult);
@@ -54,25 +53,28 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-  
-    const userMessage = { role: "user", content: input };
+
+    // Add the user's message
+    const userMessage: Message = { role: "user", content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setLoading(true);
-  
+
     try {
-      const res = await fetch("/api/chat", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: input }),
       });
-  
-      const data = await res.json();
-      const botMessage = { role: "bot", content: data.response };
+
+      const data = await response.json();
+
+      // Add the bot's response
+      const botMessage: Message = { role: "bot", content: data.response || "No response" };
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
       console.error("Error:", error);
-      const errorMessage = { role: "bot", content: "Failed to get a response. Please try again." };
+      const errorMessage: Message = { role: "bot", content: "An error occurred. Please try again." };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setLoading(false);
@@ -277,8 +279,8 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden py-6">
               <ScrollArea className="h-full w-full pr-4">
-                {messages.map(m => (
-                  <div key={m.id} className={`mb-4 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+                {messages.map((m, index) => (
+                  <div key={index} className={`mb-4 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
                     <span className={`inline-block p-3 rounded-lg ${m.role === 'user' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
                       {m.content}
                     </span>
@@ -287,10 +289,10 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
               </ScrollArea>
             </CardContent>
             <CardFooter>
-              <form onSubmit={handleSubmit} className="flex w-full items-center space-x-2">
+              <form className="flex w-full items-center space-x-2" onSubmit={sendMessage}>
                 <Input
                   value={input}
-                  onChange={handleInputChange}
+                  onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
                   className="flex-grow text-base"
                 />

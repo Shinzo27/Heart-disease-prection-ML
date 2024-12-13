@@ -16,20 +16,22 @@ export default async function handler(req: NextRequest) {
   }
 
   try {
+    // Check if the query is related to heart disease
     const relevancePrompt = `Determine if the following message is related to heart disease. If yes, provide a detailed response. If no, respond with "unrelated".\nMessage: "${message}"`;
     const relevanceResponse = await chatSession.sendMessage(relevancePrompt);
 
-    if (relevanceResponse.response.text().includes("unrelated")) {
+    // Process the relevance check
+    if (relevanceResponse?.response?.text()?.toLowerCase() === "unrelated") {
       return NextResponse.json({
         response: "This query does not seem related to heart disease. Please refine your query or specify the topic.",
       });
     }
 
+    // Generate a detailed response if relevant
     const detailedResponse = await chatSession.sendMessage(message);
     NextResponse.json({ response: detailedResponse.response.text() });
   } catch (error) {
     console.error("Error:", error);
     NextResponse.json({ error: "Failed to generate response." });
   }
-  return NextResponse.json({ name: 'John Doe' });
 }
