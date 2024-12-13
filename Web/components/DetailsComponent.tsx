@@ -26,6 +26,11 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
 
+type Message = {
+  role: "user" | "bot";
+  content: string;
+};
+
 const DetailsComponent = ({result, assessmentResult}: any) => {
   const [dietRecommendations, setDietRecommendations] = useState<string[]>([]);
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -34,6 +39,9 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
   const [assessmentData, setAssessmentData] = useState<any>(assessmentResult);
   const [isChatOpen, setIsChatOpen] = useState(false)
   const { messages, input, handleInputChange, handleSubmit } = useChat()
+  const [loading, setLoading] = useState(false);
+  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     console.log(assessmentResult);
@@ -42,6 +50,34 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
     setSuggestions(result.data.analysis.suggestions);
     setProblemAreas(result.data.analysis.problemAreas);
   }, []);
+
+  const sendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
+  
+    const userMessage = { role: "user", content: input };
+    setMessages((prev) => [...prev, userMessage]);
+    setInput("");
+    setLoading(true);
+  
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: input }),
+      });
+  
+      const data = await res.json();
+      const botMessage = { role: "bot", content: data.response };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Error:", error);
+      const errorMessage = { role: "bot", content: "Failed to get a response. Please try again." };
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen">
