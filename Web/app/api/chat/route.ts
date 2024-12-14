@@ -1,9 +1,12 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ChatSession } from '@google/generative-ai'
+import { NextRequest, NextResponse } from "next/server";
+import { ChatSession } from "@google/generative-ai";
 
-const chatSession = new ChatSession(process.env.NEXT_PUBLIC_API_KEY || "", process.env.NEXT_PUBLIC_MODEL || "");
+const chatSession = new ChatSession(
+  process.env.NEXT_PUBLIC_API_KEY || "",
+  process.env.NEXT_PUBLIC_MODEL || ""
+);
 
-export default async function handler(req: NextRequest) {
+export async function POST(req: NextRequest) {
   if (req.method !== "POST") {
     return NextResponse.json({ error: "Method not allowed" });
   }
@@ -23,13 +26,14 @@ export default async function handler(req: NextRequest) {
     // Process the relevance check
     if (relevanceResponse?.response?.text()?.toLowerCase() === "unrelated") {
       return NextResponse.json({
-        response: "This query does not seem related to heart disease. Please refine your query or specify the topic.",
+        response:
+          "This query does not seem related to heart disease. Please refine your query or specify the topic.",
       });
     }
 
     // Generate a detailed response if relevant
     const detailedResponse = await chatSession.sendMessage(message);
-    NextResponse.json({ response: detailedResponse.response.text() });
+    return NextResponse.json({ response: detailedResponse?.response?.text() });
   } catch (error) {
     console.error("Error:", error);
     NextResponse.json({ error: "Failed to generate response." });

@@ -25,6 +25,7 @@ import {
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Input } from "./ui/input";
+import Markdown from "react-markdown";
 
 type Message = {
   role: "user" | "bot";
@@ -282,7 +283,7 @@ const DetailsComponent = ({result, assessmentResult}: any) => {
                 {messages.map((m, index) => (
                   <div key={index} className={`mb-4 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
                     <span className={`inline-block p-3 rounded-lg ${m.role === 'user' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}`}>
-                      {m.content}
+                      <Markdown>{m.content}</Markdown>
                     </span>
                   </div>
                 ))}
