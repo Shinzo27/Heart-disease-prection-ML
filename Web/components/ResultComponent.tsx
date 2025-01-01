@@ -28,14 +28,10 @@ interface DietRecommendation {
 
 const ResultComponent = (result: any) => {
     const id = result.result.id;
+    const predictionData = result.result;
     const score = Math.round(result.result.prediction);
     const riskLevel = score < 30 ? "Low" : score < 70 ? "Medium" : "High";
     const [response, setResponse] = useState("");
-    const [dietRecommendation, setDietRecommendation] = useState<DietRecommendation>({
-      foods: [],
-      exercises: [],
-      supplements: []
-    });
     const [analysis, setAnalysis] = useState<Analysis>({
       problemAreas: [],
       suggestions: []
@@ -54,19 +50,19 @@ const ResultComponent = (result: any) => {
         setLoading(true);
         try {
             const data = {
-                "age": 63,
-                "sex": 1,
-                "cp": 3,
-                "trestbps": 145,
-                "chol": 233,
-                "fbs": 1,
-                "restecg": 0,
-                "thalach": 150,
-                "exang": 0,
-                "oldpeak": 2.3,
-                "slope": 0,
-                "ca": 0,
-                "thal": 1
+                "age": predictionData.age,
+                "sex": predictionData.sex,
+                "cp": predictionData.cp,
+                "trestbps": predictionData.trestbps,
+                "chol": predictionData.chol,
+                "fbs": predictionData.fbs,
+                "restecg": predictionData.restecg,
+                "thalach": predictionData.thalach,
+                "exang": predictionData.exang,
+                "oldpeak": predictionData.oldpeak,
+                "slope": predictionData.slope,
+                "ca": predictionData.ca,
+                "thal": predictionData.thal,
               }
               const prompt = `You are an API for a health application. Always respond in JSON format with the following structure:
                   {
@@ -101,12 +97,13 @@ const ResultComponent = (result: any) => {
                   }}
       
                   Provide a response in this format.`
-              const result = await model.generateContent([prompt]);       
+              const result = await model.generateContent([prompt]);
+              console.log(result.response.text());
               setResponse(result.response.text());
               const parse = md.parse(result.response.text(), {});
               const json = JSON.parse(parse[0].content);
+              console.log(json.data.analysis);
               setAnalysis(json.data.analysis);
-              setDietRecommendation(json.data.dietRecommendation);
               console.log(json);
         } catch (error) {
             console.log(error);
@@ -115,6 +112,7 @@ const ResultComponent = (result: any) => {
         }
       }
       generate();
+      console.log(predictionData);
   }, []);
 
     return loading ? <Loader/> : (

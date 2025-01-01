@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -96,6 +97,7 @@ export default function Assessment() {
                 "Your heart health assessment has been received. We'll process your results shortly.",
             });
             router.push(`/result/${data.data.id}`);
+            setLoading(false);
           } else {
             toast({
               title: "Assessment Not Submitted",
@@ -113,8 +115,6 @@ export default function Assessment() {
       }
     } catch (error) {
       console.log(error);
-    } finally {
-      setLoading(false);
     }
   };
 

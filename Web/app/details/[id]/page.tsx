@@ -9,7 +9,7 @@ export default async function Page({ params }: { params: Promise<{ id: number }>
     const md = new MarkdownIt();
     const parse = md.parse(predict, {})
     const result = JSON.parse(parse[0].content)
-    console.log(getData);
+    
     return (
       <DetailsComponent result={result} assessmentResult={getData} />
     )
