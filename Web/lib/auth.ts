@@ -1,6 +1,21 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { DefaultSession, Session, User } from "next-auth";
+
+declare module 'next-auth' {
+  interface User {
+    id: string;
+  }
+}
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+    } & DefaultSession["user"];
+  }
+}
 
 export const NEXT_AUTH = {
   providers: [
@@ -10,28 +25,31 @@ export const NEXT_AUTH = {
         username: { label: "Username", type: "text" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials: any) {
-        // if (!credentials?.email || !credentials?.password) {
-        //   return null;
-        // }
-        // const user = await prisma.user.findFirst({
-        //   where: {
-        //     email: credentials.email,
-        //   },
-        // })
-        // if (!user) {
-        //   return null;
-        // }
-        // const passwordMatch = await validatePassword(credentials.password, user?.password);
-        // if (!passwordMatch) {
-        //   return null;
-        // }
-        // return {
-        //   id: user.id,
-        //   name: user.username,
-        //   email: user.email,
-        // };
-        return credentials;
+      async authorize(credentials: any): Promise<User | null> {
+        console.log(credentials)
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+        const user = await prisma.user.findFirst({
+          where: {
+            email: credentials.email,
+          },
+        })
+        console.log(user)
+        if (!user) {
+          return null;
+        }
+        const passwordMatch = await validatePassword(credentials.password, user?.password);
+        console.log(passwordMatch)
+        if (!passwordMatch) {
+          return null;
+        }
+        console.log(user)
+        return {
+          id: user.id.toString(),
+          name: user.name,
+          email: user.email,
+        };
       },
     }),
   ],

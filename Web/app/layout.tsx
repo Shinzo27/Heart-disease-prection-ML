@@ -4,6 +4,8 @@ import "./globals.css";
 import AppBar from "@/components/AppBar";
 import Footer from "@/components/Footer";
 import { Toaster } from "@/components/ui/toaster";
+import { SessionProvider } from "next-auth/react";
+import { Providers } from "@/lib/Providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,10 +22,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AppBar/>
-        {children}
-        <Footer/>
-        <Toaster/>
+          <Providers>
+            <AppBar/>
+            {children}
+            <Footer/>
+            <Toaster/>
+          </Providers>
         </body>
     </html>
   );

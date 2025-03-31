@@ -8,6 +8,7 @@ import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
+import Loader from "@/components/Loader";
 
 const page = () => {
   const router = useRouter();
@@ -18,6 +19,7 @@ const page = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const formData = {
     name: name,
@@ -26,7 +28,7 @@ const page = () => {
     confirmPassword: confirmPassword,
   };
 
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       toast({
@@ -36,31 +38,43 @@ const page = () => {
       });
       return;
     }
-    console.log(formData);
-    const res = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
-    });
-    const data = await res.json();
-    if (data.status !== 200) {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.status !== 200) {
+        toast({
+          title: "Error",
+          description: "Something went wrong.",
+          variant: "destructive",
+        });
+        return;
+      }
+      toast({
+        title: "Account created",
+        description: "Your account has been created successfully.",
+      });
+      router.push("/signin");
+    } catch (error) {
       toast({
         title: "Error",
         description: "Something went wrong.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
-    toast({
-      title: "Account created",
-      description: "Your account has been created successfully."
-    });
-    router.push("/signin");
   };
 
-  return (
+  return isLoading ? (
+    <Loader />
+  ) : (
     <div className="flex flex-col min-h-screen">
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
@@ -140,7 +154,12 @@ const page = () => {
               </Button>
             </form>
             <div className="flex justify-center pt-4">
-              <Link href="/signin" className="text-sm text-gray-500 hover:text-gray-900">Already have an account? Sign In</Link>
+              <Link
+                href="/signin"
+                className="text-sm text-gray-500 hover:text-gray-900"
+              >
+                Already have an account? Sign In
+              </Link>
             </div>
           </div>
         </div>

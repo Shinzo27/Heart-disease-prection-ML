@@ -8,9 +8,27 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Heart, Shield, Activity, Brain, CheckCircle, Users, BarChart, Clock } from "lucide-react"
 import Footer from "./Footer"
 import AppBar from "./AppBar"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { toast } from "@/hooks/use-toast"
 
 export default function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+  const { data: session } = useSession();
+  const router = useRouter();
+
+  const handleStartAssessment = () => {
+    if(session) {
+      router.push("/assessment")
+    } else {
+      toast({
+        title: "Please login to start assessment",
+        description: "You can login with your account or signup with your email",
+      })
+      router.push("/signin")
+    }
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -27,8 +45,8 @@ export default function LandingPage() {
                 personalized recommendations for a healthier life.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 mt-4">
-                <Button asChild size="lg" className="bg-red-500 hover:bg-red-600">
-                  <Link href="/assessment">Start Your Assessment</Link>
+                <Button size="lg" className="bg-red-500 hover:bg-red-600" onClick={handleStartAssessment}>
+                  Start Your Assessment
                 </Button>
                 <Button asChild variant="outline" size="lg">
                   <Link href="/about">Learn More</Link>

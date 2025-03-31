@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import axios from 'axios'
 import Loader from "@/components/Loader";
+import { useSession } from "next-auth/react";
 
 export default function Assessment() {
   const router = useRouter();
@@ -38,6 +39,8 @@ export default function Assessment() {
   const [ca, setCa] = useState("");
   const [thal, setThal] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { data: session } = useSession();
 
   const data = {
     age: Number(age),
@@ -86,6 +89,7 @@ export default function Assessment() {
             ca: ca,
             thal: thal,
             prediction: prediction,
+            userId: session?.user?.id,
           }),
         });
         if(insert){

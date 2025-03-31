@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { toast } from '@/hooks/use-toast'
-import { Heart, Menu, EyeIcon, EyeOffIcon, Router } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
+import Loader from '@/components/Loader'
 
 const page = () => {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -16,6 +18,7 @@ const page = () => {
         email: '',
         password: '',
     })
+    const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,17 +26,41 @@ const page = () => {
         setFormData(prev => ({ ...prev, [name]: value }))
       }
     
-      const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+      const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setIsLoading(true)
         console.log(formData)
-        toast({
-          title: "Sign In Successful",
-          description: "Welcome back to HeartGuard AI!",
-        })
-        router.push('/')
+        try {
+          const signin = await signIn("credentials", {
+            email: formData.email,
+            password: formData.password,
+            redirect: false
+          });
+          if(signin?.ok){
+            toast({
+              title: "Sign In Successful",
+              description: "Welcome back to HeartGuard AI!",
+            })
+            router.push("/")
+          } else {
+            toast({
+              title: "Invalid email or password",
+              description: "Please check your credentials and try again.",
+              variant: "destructive",
+            })
+          }
+        } catch (error) {
+          toast({
+            title: "Something went wrong!",
+            description: "Please try again.",
+            variant: "destructive",
+          })
+        } finally {
+          setIsLoading(false);
+        }
       }
 
-    return (
+    return isLoading ? <Loader /> : (
         <div className="flex flex-col min-h-screen">
           <main className="flex-1">
             <div className="container mx-auto px-4 py-8">
