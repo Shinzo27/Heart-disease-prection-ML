@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { EyeIcon, EyeOffIcon, Link } from "lucide-react";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Link from "next/link";
 
 const page = () => {
   const router = useRouter();
@@ -138,12 +139,9 @@ const page = () => {
                 Sign Up
               </Button>
             </form>
-            <p className="text-center mt-4 text-sm text-gray-600">
-              Already have an account?{" "}
-              <Link href="/signin" className="text-red-500 hover:underline">
-                Sign In
-              </Link>
-            </p>
+            <div className="flex justify-center pt-4">
+              <Link href="/signin" className="text-sm text-gray-500 hover:text-gray-900">Already have an account? Sign In</Link>
+            </div>
           </div>
         </div>
       </main>

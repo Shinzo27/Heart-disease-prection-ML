@@ -1,13 +1,9 @@
-import Hero from "@/components/Hero";
-import About from "@/components/About";
-import StartAssessment from "@/components/StartAssessment";
+import LandingPage from "@/components/LandingPage";
 
 export default function Home() {
   return (
     <>
-      <Hero />
-      <About />
-      <StartAssessment />
+      <LandingPage />
     </>
   );
 }

@@ -8,7 +8,7 @@ export default function AppBar() {
         <Heart className="h-6 w-6 text-red-500" />
         <span className="">HeartGuard AI</span>
       </Link>
-      <nav className="ml-auto flex gap-4 sm:gap-6">
+      <nav className="ml-auto flex gap-4 sm:gap-6 items-center">
         <Link
           className="text-sm font-medium hover:underline underline-offset-4"
           href="/features"
@@ -26,6 +26,12 @@ export default function AppBar() {
           href="#"
         >
           Contact
+        </Link>
+        <Link
+          className="text-sm font-medium bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
+          href="/signin"
+        >
+          Login
         </Link>
       </nav>
     </header>
