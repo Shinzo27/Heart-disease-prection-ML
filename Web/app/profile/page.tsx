@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { format } from "date-fns"
 import {
@@ -35,6 +35,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Progress } from "@/components/ui/progress"
+import { useSession } from "next-auth/react"
+import { useRouter } from "next/navigation"
 
 // Mock data for the dashboard
 const userData = {
@@ -153,7 +155,41 @@ const cholesterolHistory = [
 ]
 
 export default function Dashboard() {
+  const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { data: session, status } = useSession();
+  const [loading, setLoading] = useState(false)
+  const [user, setUser] = useState<{
+    id: string;
+    name: string;
+    email: string;
+    createdAt: string;
+    status: number;
+  } | null>(null)
+
+  useEffect(() => {
+    const getUserData = async () => {
+      try {
+        const response = await fetch("/api/info", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ userEmail: session?.user.email })
+        })
+        const data = await response.json()
+        if(data.status === 200) {
+          setUser(data)
+        } else {
+          setUser(null)
+          router.push("/signin")
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error); 
+      }
+    }
+    getUserData()
+  }, [])
 
   // Function to get status color
   const getStatusColor = (status: string) => {
@@ -232,31 +268,27 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src="/placeholder.svg?height=96&width=96" alt={userData.name} />
-                    <AvatarFallback className="text-2xl">SJ</AvatarFallback>
-                  </Avatar>
                   <div className="text-center">
-                    <h3 className="text-xl font-bold">{userData.name}</h3>
-                    <p className="text-sm text-gray-500">{userData.email}</p>
+                    <h3 className="text-xl font-bold">{user?.name}</h3>
+                    <p className="text-sm text-gray-500">{user?.email}</p>
                   </div>
                   <div className="w-full grid grid-cols-2 gap-4 text-sm">
                     <div className="flex flex-col">
-                      <span className="text-gray-500">Age</span>
-                      <span className="font-medium">{userData.age}</span>
+                      <span className="text-gray-500">Id</span>
+                      <span className="font-medium">{user?.id}</span>
                     </div>
                     <div className="flex flex-col">
-                      <span className="text-gray-500">Gender</span>
-                      <span className="font-medium">{userData.gender}</span>
+                      <span className="text-gray-500">Email</span>
+                      <span className="font-medium">{user?.email}</span>
                     </div>
                     <div className="flex flex-col">
                       <span className="text-gray-500">Member Since</span>
-                      <span className="font-medium">{format(new Date(userData.joinDate), "MMM d, yyyy")}</span>
+                      <span className="font-medium">{user?.createdAt.trim().split("T")[0]}</span>
                     </div>
-                    <div className="flex flex-col">
+                    {/* <div className="flex flex-col">
                       <span className="text-gray-500">Last Assessment</span>
                       <span className="font-medium">{format(new Date(userData.lastAssessment), "MMM d, yyyy")}</span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </CardContent>
